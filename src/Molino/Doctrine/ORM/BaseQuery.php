@@ -168,7 +168,14 @@ abstract class BaseQuery extends BaseBaseQuery
     {
         $parameterId = $this->generateParameterId();
         $rootAlias = $this->getQueryBuilder()->getRootAlias();
-        $this->getQueryBuilder()->andWhere(sprintf('%s.%s %s ?%d', $rootAlias, $field, $comparison, $parameterId));
+
+        if (is_array($value)) {
+            $dqlTemplate = '%s.%s %s (?%d)';
+        } else {
+            $dqlTemplate = '%s.%s %s ?%d';
+        }
+
+        $this->getQueryBuilder()->andWhere(sprintf($dqlTemplate, $rootAlias, $field, $comparison, $parameterId));
         $this->getQueryBuilder()->setParameter($parameterId, $value);
     }
 
