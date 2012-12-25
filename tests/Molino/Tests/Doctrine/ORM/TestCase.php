@@ -5,6 +5,7 @@ namespace Molino\Tests\Doctrine\ORM;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Common\Collections\ArrayCollection;
 use Model\Doctrine\ORM\Article;
 
 class TestCase extends \PHPUnit_Framework_TestCase
@@ -40,5 +41,15 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $this->entityManager->flush();
 
         return $articles;
+    }
+
+    protected function paramsToArray(ArrayCollection $paramCollection)
+    {
+        $parametersArray = array();
+        foreach ($paramCollection->toArray() as $parameter) {
+            $parametersArray[$parameter->getName()] = $parameter->getValue();
+        }
+
+        return $parametersArray;
     }
 }

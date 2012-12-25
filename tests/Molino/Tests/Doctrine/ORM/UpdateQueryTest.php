@@ -28,7 +28,7 @@ class UpdateQueryTest extends TestCase
     {
         $this->assertSame($this->query, $this->query->set('title', 'foo'));
         $this->assertSame('UPDATE Model\Doctrine\ORM\Article m SET m.title = ?1', $this->query->getQueryBuilder()->getDQL());
-        $this->assertSame(array(1 => 'foo'), $this->query->getQueryBuilder()->getParameters());
+        $this->assertSame(array(1 => 'foo'), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 
     public function testInc()

@@ -35,14 +35,14 @@ class BaseQueryTest extends TestCase
     {
         $this->assertSame($this->query, $this->query->filterEqual('title', 'foo'));
         $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.title = ?1', $this->query->getQueryBuilder()->getDQL());
-        $this->assertSame(array(1 => 'foo'), $this->query->getQueryBuilder()->getParameters());
+        $this->assertSame(array(1 => 'foo'), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 
     public function testFilterNotEqual()
     {
         $this->assertSame($this->query, $this->query->filterNotEqual('title', 'foo'));
         $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.title <> ?1', $this->query->getQueryBuilder()->getDQL());
-        $this->assertSame(array(1 => 'foo'), $this->query->getQueryBuilder()->getParameters());
+        $this->assertSame(array(1 => 'foo'), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 
     /**
@@ -52,7 +52,7 @@ class BaseQueryTest extends TestCase
     {
         $this->assertSame($this->query, $this->query->filterLike('title', $value));
         $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.title LIKE ?1', $this->query->getQueryBuilder()->getDQL());
-        $this->assertSame(array(1 => $like), $this->query->getQueryBuilder()->getParameters());
+        $this->assertSame(array(1 => $like), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 
     /**
@@ -62,7 +62,7 @@ class BaseQueryTest extends TestCase
     {
         $this->assertSame($this->query, $this->query->filterNotLike('title', $value));
         $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.title NOT LIKE ?1', $this->query->getQueryBuilder()->getDQL());
-        $this->assertSame(array(1 => $like), $this->query->getQueryBuilder()->getParameters());
+        $this->assertSame(array(1 => $like), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 
     public function filterLikeProvider()
@@ -79,43 +79,43 @@ class BaseQueryTest extends TestCase
     public function testFilterIn()
     {
         $this->assertSame($this->query, $this->query->filterIn('title', array('foo', 'bar')));
-        $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.title IN ?1', $this->query->getQueryBuilder()->getDQL());
-        $this->assertSame(array(1 => array('foo', 'bar')), $this->query->getQueryBuilder()->getParameters());
+        $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.title IN (?1)', $this->query->getQueryBuilder()->getDQL());
+        $this->assertSame(array(1 => array('foo', 'bar')), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 
     public function testFilterNotIn()
     {
         $this->assertSame($this->query, $this->query->filterNotIn('title', array('foo', 'bar')));
-        $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.title NOT IN ?1', $this->query->getQueryBuilder()->getDQL());
-        $this->assertSame(array(1 => array('foo', 'bar')), $this->query->getQueryBuilder()->getParameters());
+        $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.title NOT IN (?1)', $this->query->getQueryBuilder()->getDQL());
+        $this->assertSame(array(1 => array('foo', 'bar')), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 
     public function testFilterGreater()
     {
         $this->assertSame($this->query, $this->query->filterGreater('age', 20));
         $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.age > ?1', $this->query->getQueryBuilder()->getDQL());
-        $this->assertSame(array(1 => 20), $this->query->getQueryBuilder()->getParameters());
+        $this->assertSame(array(1 => 20), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 
     public function testFilterLess()
     {
         $this->assertSame($this->query, $this->query->filterLess('age', 20));
         $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.age < ?1', $this->query->getQueryBuilder()->getDQL());
-        $this->assertSame(array(1 => 20), $this->query->getQueryBuilder()->getParameters());
+        $this->assertSame(array(1 => 20), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 
     public function testFilterGreaterEqual()
     {
         $this->assertSame($this->query, $this->query->filterGreaterEqual('age', 20));
         $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.age >= ?1', $this->query->getQueryBuilder()->getDQL());
-        $this->assertSame(array(1 => 20), $this->query->getQueryBuilder()->getParameters());
+        $this->assertSame(array(1 => 20), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 
     public function testFilterLessEqual()
     {
         $this->assertSame($this->query, $this->query->filterLessEqual('age', 20));
         $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.age <= ?1', $this->query->getQueryBuilder()->getDQL());
-        $this->assertSame(array(1 => 20), $this->query->getQueryBuilder()->getParameters());
+        $this->assertSame(array(1 => 20), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 
     public function testSeveral()
@@ -125,7 +125,18 @@ class BaseQueryTest extends TestCase
             ->filterNotEqual('content', 'bar')
             ->filterIn('author', array(1, 2))
         ;
+        $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.title = ?1 AND m.content <> ?2 AND m.author IN (?3)', $this->query->getQueryBuilder()->getDQL());
+        $this->assertSame(array(1 => 'foo', 2 => 'bar', 3 => array(1, 2)), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
+    }
+
+    public function testOne()
+    {
+        $this->query
+            ->filterEqual('title', 'foo')
+            ->filterNotEqual('content', 'bar')
+            ->filterIn('author', array(1))
+        ;
         $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.title = ?1 AND m.content <> ?2 AND m.author IN ?3', $this->query->getQueryBuilder()->getDQL());
-        $this->assertSame(array(1 => 'foo', 2 => 'bar', 3 => array(1, 2)), $this->query->getQueryBuilder()->getParameters());
+        $this->assertSame(array(1 => 'foo', 2 => 'bar', 3 => array(1, 2)), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 }
