@@ -1,28 +1,13 @@
 <?php
 
-$vendorDir = __DIR__.'/../vendor';
-require_once $vendorDir.'/symfony/src/Symfony/Component/ClassLoader/UniversalClassLoader.php';
+if (!file_exists($file = __DIR__.'/../vendor/autoload.php')) {
+    throw new RuntimeException('Install dependencies to run test suite.');
+}
 
-use Symfony\Component\ClassLoader\UniversalClassLoader;
+$loader = require_once $file;
 
-$loader = new UniversalClassLoader();
-$loader->registerNamespaces(array(
-    'Molino'                 => array(__DIR__.'/../src', __DIR__),
-    'Symfony'                => $vendorDir.'/symfony/src',
-    'Pagerfanta'             => $vendorDir.'/pagerfanta/src',
-    'Mandango\\Mondator'     => $vendorDir.'/mondator/src',
-    'Mandango'               => $vendorDir.'/mandango/src',
-    'Doctrine\\Common'       => $vendorDir.'/doctrine-common/lib',
-    'Doctrine\\MongoDB'      => $vendorDir.'/doctrine-mongodb/lib',
-    'Doctrine\\ODM\\MongoDB' => $vendorDir.'/doctrine-mongodb-odm/lib',
-    'Doctrine\\DBAL'         => $vendorDir.'/doctrine-dbal/lib',
-    'Doctrine\\ORM'          => $vendorDir.'/doctrine-orm/lib',
-    'Model'                  => __DIR__,
-));
-$loader->registerPrefixes(array(
-    'Twig_' => $vendorDir.'/twig/lib',
-));
-$loader->register();
+$loader->add('Model', __DIR__);
+$loader->add('Molino', __DIR__);
 
 /*
  * Generate Mandango model.
