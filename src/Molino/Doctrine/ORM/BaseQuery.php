@@ -193,7 +193,7 @@ abstract class BaseQuery extends BaseBaseQuery
      */
     private function getDqlFieldTemplateForValue($value)
     {
-        if (is_array($value)) {
+        if (count($value) > 1) {
             return '%s.%s %s (?%d)';
         }
 

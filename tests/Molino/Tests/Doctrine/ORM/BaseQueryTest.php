@@ -118,7 +118,7 @@ class BaseQueryTest extends TestCase
         $this->assertSame(array(1 => 20), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 
-    public function testSeveral()
+    public function testArraySizeMoreThanOneOnFilterInHasParenthesis()
     {
         $this->query
             ->filterEqual('title', 'foo')
@@ -129,7 +129,7 @@ class BaseQueryTest extends TestCase
         $this->assertSame(array(1 => 'foo', 2 => 'bar', 3 => array(1, 2)), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 
-    public function testOne()
+    public function testArraySizeOneOnFilterInHasNoParenthesis()
     {
         $this->query
             ->filterEqual('title', 'foo')
@@ -137,6 +137,6 @@ class BaseQueryTest extends TestCase
             ->filterIn('author', array(1))
         ;
         $this->assertSame('SELECT FROM Model\Doctrine\ORM\Article m WHERE m.title = ?1 AND m.content <> ?2 AND m.author IN ?3', $this->query->getQueryBuilder()->getDQL());
-        $this->assertSame(array(1 => 'foo', 2 => 'bar', 3 => array(1, 2)), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
+        $this->assertSame(array(1 => 'foo', 2 => 'bar', 3 => array(1)), $this->paramsToArray($this->query->getQueryBuilder()->getParameters()));
     }
 }
