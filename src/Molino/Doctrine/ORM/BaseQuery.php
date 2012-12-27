@@ -168,9 +168,8 @@ abstract class BaseQuery extends BaseBaseQuery
     {
         $parameterId = $this->generateParameterId();
         $rootAlias = $this->getQueryBuilder()->getRootAlias();
-        $dqlTemplate = $this->getDqlFieldTemplateForValue($value);
 
-        $this->getQueryBuilder()->andWhere(sprintf($dqlTemplate, $rootAlias, $field, $comparison, $parameterId));
+        $this->getQueryBuilder()->andWhere(sprintf('%s.%s %s (?%d)', $rootAlias, $field, $comparison, $parameterId));
         $this->getQueryBuilder()->setParameter($parameterId, $value);
     }
 
@@ -185,18 +184,5 @@ abstract class BaseQuery extends BaseBaseQuery
         }, $this->parseLike($value));
 
         return implode('', $parsed);
-    }
-
-    /**
-     * @param $value
-     * @return string
-     */
-    private function getDqlFieldTemplateForValue($value)
-    {
-        if (count($value) > 1) {
-            return '%s.%s %s (?%d)';
-        }
-
-        return '%s.%s %s ?%d';
     }
 }
