@@ -168,8 +168,12 @@ abstract class BaseQuery extends BaseBaseQuery
     {
         $parameterId = $this->generateParameterId();
         $rootAlias = $this->getQueryBuilder()->getRootAlias();
-
-        $this->getQueryBuilder()->andWhere(sprintf('%s.%s %s (?%d)', $rootAlias, $field, $comparison, $parameterId));
+        if ($comparison == 'IN') {
+            $dqlSyntax = '%s.%s %s (?%d)';
+        } else {
+            $dqlSyntax = '%s.%s %s ?%d';
+        }
+        $this->getQueryBuilder()->andWhere(sprintf($dqlSyntax, $rootAlias, $field, $comparison, $parameterId));
         $this->getQueryBuilder()->setParameter($parameterId, $value);
     }
 
